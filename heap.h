@@ -2,6 +2,7 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector>
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -58,17 +59,49 @@ public:
    * 
    */
   size_t size() const;
-
+  void heapify(int index);
+  void trickleUp(int location);
 private:
   /// Add whatever helper functions and data members you need below
-
-
-
-
+  std::vector<T> heapList;
+  unsigned int size_;
+  int ary_;
+  PComparator comparator_;
 };
 
 // Add implementation of member functions here
+template <typename T, typename PComparator>
+Heap<T,PComparator>::Heap(int m, PComparator c) :
+  ary_(m), comparator_(c) 
+{
+  size_ = 0;
+}
 
+template <typename T, typename PComparator>
+Heap<T,PComparator>::~Heap() 
+{
+
+}
+
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::push(const T& item)
+{
+  heapList.push_back(item);
+  ++size_;
+  trickleUp(heapList.size()-1);
+}
+
+template <typename T, typename PComparator>
+bool Heap<T,PComparator>::empty() const
+{
+  return size_ == 0;
+}
+
+template <typename T, typename PComparator>
+size_t Heap<T,PComparator>::size() const
+{
+  return size_;
+}
 
 // We will start top() for you to handle the case of 
 // calling top on an empty heap
@@ -81,14 +114,11 @@ T const & Heap<T,PComparator>::top() const
     // ================================
     // throw the appropriate exception
     // ================================
-
-
+    throw std::underflow_error("Heap is empty");
   }
   // If we get here we know the heap has at least 1 item
   // Add code to return the top element
-
-
-
+  return heapList[0];
 }
 
 
@@ -101,15 +131,46 @@ void Heap<T,PComparator>::pop()
     // ================================
     // throw the appropriate exception
     // ================================
-
-
+    throw std::underflow_error("Heap is empty");
   }
-
-
-
+  heapList[0] = heapList.back();
+  heapList.pop_back();
+  heapify(0);
+  size_--;
 }
 
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::heapify(int index)
+{
+  if ((ary_*index + 1) > size()-1) {
+		return;
+	}
+	int leftChild = ary_*index + 1;
+	int bestChild = leftChild;
+  int i = 2;
+	while ((ary_*index + i) < size() && i <= ary_) {
+    int tempChild = ary_*index + i;
+    if (comparator_(heapList[tempChild], heapList[bestChild])) {
+        bestChild = tempChild;
+    }
+    ++i;
+	}
+	if (comparator_(heapList[bestChild], heapList[index])) {
+			std::swap(heapList[index], heapList[bestChild]);
+			heapify(bestChild);
+	}
+}
 
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::trickleUp(int location)
+{
+  int parent = (location-1)/ary_;
+  while(parent >= 0 && comparator_(heapList[location], heapList[parent])) {
+    std::swap(heapList[parent], heapList[location]);
+    location = parent;
+    parent = (location-1)/ary_;
+  }
+}
 
 #endif
 

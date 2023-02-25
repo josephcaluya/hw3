@@ -66,7 +66,11 @@ void dealloc(Node* head)
 //   Add any helper functions or
 //   function object struct declarations
 // -----------------------------------------------
-
+struct isOdd {
+    bool operator()(int x) {
+        return x % 2 != 0;
+    }
+};
 
 
 
@@ -84,8 +88,11 @@ int main(int argc, char* argv[])
     Node* head = readList(argv[1]);
     cout << "Original list: ";
     print(head);
+    isOdd c1;
 
     // Test out your linked list code
+    Node* head2 = llfilter(head, c1);
+    print(head2);
 
 
 
